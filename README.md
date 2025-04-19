@@ -34,7 +34,7 @@ You’ll be prompted like:
     Enter output file path: /home/user/cron_output.txt
     Is this a system-wide cronjob? (y/n): n
 
-    This will generate and install a cron job like:
+This will generate and install a cron job like:
 
     0 12 * * 1-5 grep "failed" /var/log/auth.log >> /home/user/cron_output.txt
 
@@ -47,7 +47,7 @@ If you select system-wide:
 
     The job will be saved to /etc/cron.d/<filename>
 
-    Enter filename to save cronjob as: daily_log_check
+Enter filename to save cronjob as: daily_log_check
 
 
 📋 Requirements
