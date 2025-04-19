@@ -20,7 +20,7 @@ A simple interactive Bash script to help you create cron jobs easily without hav
 
     ./cronjob_generator.sh
 
-    You’ll be prompted like:
+You’ll be prompted like:
 
     Enter minute: 0
     Enter hour: 12
@@ -47,7 +47,7 @@ If you select system-wide:
 
     The job will be saved to /etc/cron.d/<filename>
 
-Enter filename to save cronjob as: daily_log_check
+    Enter filename to save cronjob as: daily_log_check
 
 
 📋 Requirements
