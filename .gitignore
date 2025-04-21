@@ -1,0 +1,33 @@
+# Ignore logs and temp files
+*.log
+*.tmp
+*.bak
+
+# Ignore system files (Mac & Windows)
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Ignore Cursor & VSCode settings
+.cursor/
+.vscode/
+
+# Ignore compiled executables & downloads
+*.exe
+*.msi
+*.zip
+*.tar.gz
+downloads/
+
+# Ignore credentials and sensitive data
+config.ps1
+.env
+secrets.txt
+
+# Ignore PowerShell-specific cache files
+*.ps1xml
+*.psc1
+*.pssc
+
+# Ignore PowerShell module install locations (if using custom modules)
+PowerShellModules/

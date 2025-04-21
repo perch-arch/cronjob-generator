@@ -7,12 +7,14 @@
     # where to save the script incase its system-wide or just adding a user makes it that?
  # fault parameters
 
-cron_generate (){
-local minute_hour
-read -p "Enter minute_hour: " minute_hour
+cronjob_generator (){
 
-local day
-read -p "Enter day: " day
+#declare schedule variables
+local minute
+read -p "Enter minute: " minute
+
+local hour
+read -p "Enter hour: " hour
 
 local dom
 read -p "Enter dom: " dom
@@ -21,73 +23,101 @@ local month
 read -p "Enter month: " month
 
 local dow
-read -p "Enter day of the week: " dow
+read -p "Enter hour of the week: " dow
 
-local user
-read -p "Enter user: " user
+# declare action to run
+local command
+read -p "Enter base command to run (e.g, grep "failed"): " command 
+# declare input and output files
+local input 
+read -p "Does your command require a log or an input file (y/n): " input
 
-local keyword
-read -p "Enter keyword:" keyword
+if [ $input == "y" ]; then 
+    read -p  "Enter input file path: " InputFile
+fi
 
+local output
+read -p "Do you want to redirect output to a file (y/n): " output
+
+if [ $output == "y" ]; then 
+    read -p "Enter output file name/path (e.g., /home/perch/Documents/date): " SaveOutputAs
+fi
+
+# declare if systemwide or user cronjob
 local systemwide
 read -p "Is this a system-wide cronjob? (y/n): " systemwide
 
-
-local logfile 
-logfile="/home/perch/Documents/auth.log" 
-output="/home/perch/Documents/authtest3.txt"
-
-
-if [ -z "$minute_hour" ]; then
-    minute_hour="*"
+if [ $systemwide == "y" ]; then
+    read -p "Enter user: " user
 fi
 
-if [ -z "$day" ]; then
-    day="*"
+if [ -z $minute ]; then
+    minute="*"
 fi
 
-if [ -z "$dom" ]; then
+if [ -z $hour ]; then
+    hour="*"
+fi
+
+if [ -z $dom ]; then
     dom="*"
 fi
 
-if [ -z "$month" ]; then
+if [ -z $month ]; then
     month="*"
 fi
 
-if [ -z "$dow" ]; then
+if [ -z $dow ]; then
     dow="*"
 fi
 
+# command construction
 
-local command="grep $keyword $logfile >> $output"
+local cron_time="$minute $hour $dom $month $dow"
 
-cron_line="$minute_hour $day $dom $month $dow $user"
+full_command="$command"
 
-cron_command="$cron_line $command"
+if [ $input == "y" ]; then
+    full_command="$command $InputFile"
+fi
 
-echo "$cron_command"
+if [ $output == "y" ]; then
+    full_command="$command >> ${SaveOutputAs}_\$(date +\%Y\%m\%d_\%H\%M\%S).log"
+fi
+
+if [ $output == "y" ] && [ $input == "y" ]; then
+    full_command="$command $InputFile >> ${SaveOutputAs}_\$(date +\%Y\%m\%d_\%H\%M\%S).log"
+fi
+ 
+cron_command="$cron_time $user $full_command"
+
 
 if [ "$systemwide" == "y" ] && [ -n "$user" ]; then
     local filename
-    read -p "Enter filename to save cronjob as: " filename
-    echo "$cron_command" >> "etc/cron.d/$filename"
-    return 0
-fi
+    while true; do
+        read -p "Enter filename to save cronjob as: " filename
 
-if [ -z "$user" ]; then
-    (crontab -l 2>/dev/null; echo "$cron_command") | crontab -
-    crontab -l
-    return 0
-fi
+        if [[ "$filename" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+            break
+        else
+            echo "Invalid filename. Only letters, numbers, dashes (-), and underscores (_) are allowed."
+        fi
 
+    done
+    
+    echo "$cron_command" | sudo tee "/etc/cron.d/$filename"
 
-if [ -n "$user" ]; then
+elif [ -n "$user" ]; then
     (crontab -u "$user" -l 2>/dev/null; echo "$cron_command") |  crontab -u "$user"
     crontab  -u "$user" -l
+
+else
+    (crontab -l 2>/dev/null; echo "$cron_command") | crontab -
+
 fi
 
 }
 
-cron_generate
+cronjob_generator
 
 
